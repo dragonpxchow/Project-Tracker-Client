@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { loadUser } from "./redux/actions/authActions";
+import Navbar from "./components/layout/navbar";
+import Home from "./components/pages/home";
+import SignIn from "./components/auth/signIn";
+import SignUp from "./components/auth/signUp";
+import "./styles/app.css";
 
-function App() {
+const App = () => {
+  //const {userData, setUserData} = useState({token:undefined, user:undefined});
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(loadUser());
+  }, []);
+  /*
+  componentDidMount() {
+    store.dispatch(loadUser())
+  }
+  */
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <div className="App">
+          <Navbar />
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route path="/signin" component={SignIn} />
+            <Route path="/signup" component={SignUp} />
+          </Switch>
+        </div>
+      </BrowserRouter>
+    </>
   );
-}
+};
 
 export default App;
