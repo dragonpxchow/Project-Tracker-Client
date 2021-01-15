@@ -2,7 +2,7 @@ import * as api from "../../api/authServices";
 //import axios from "axios";
 import http from "../../api/httpServices";
 
-import { returnErrors } from "./errorAction";
+import { setErrors, clearErrors } from "./errorAction";
 import {
   USER_LOADING,
   USER_LOADED,
@@ -12,6 +12,7 @@ import {
   SIGNOUT_SUCCESS,
   SIGNUP_SUCCESS,
   SIGNUP_FAIL,
+  CLEAR_ERRORS,
 } from "./actionTypes";
 
 // check token and load user data
@@ -23,10 +24,10 @@ export const loadUser = () => async (dispatch, getState) => {
   // same with axios.defaults.headers.common["x-auth-token"] = jwt;
   const token = getState().auth.token;
   http.setJwt(token); // fixing bi-directional dependencies
+  console.log("authActions loadUser token >>>>", token);
   await http
     .get("/users/me")
     .then((res) => {
-      console.log("AuthActions data >>>>>>", res);
       dispatch({
         type: USER_LOADED,
         payload: res.data,
@@ -34,50 +35,13 @@ export const loadUser = () => async (dispatch, getState) => {
     })
     .catch((error) => {
       console.log("authActions error >>>>>>>", error.response);
-      dispatch(returnErrors(error.response.data.msg, error.response.status));
+      dispatch(setErrors(error.response.data, error.response.status));
       dispatch({
         type: AUTH_ERROR,
       });
     });
-
-  /*
-  axios
-    .get("/api/auth/user", tokenConfig(getState))
-    .then((res) =>
-      dispatch({
-        type: USER_LOADED,
-        payload: res.data,
-      })
-    )
-    .catch((err) => {
-      dispatch(returnErrors(err.response.data, err.response.status));
-      dispatch({
-        type: AUTH_ERROR,
-      });
-    });
-    */
 };
-/*
-// Setup config/headers and token
-export const tokenConfig = (getState: Function) => {
-  // Get token from localstorage
-  const token = getState().auth.token;
 
-  // Headers
-  const config: IConfigHeaders = {
-    headers: {
-      "Content-type": "application/json",
-    },
-  };
-
-  // If token, add to headers
-  if (token) {
-    config.headers["x-auth-token"] = token;
-  }
-
-  return config;
-};
-*/
 // action creators
 export const signIn = (loginData) => async (dispatch) => {
   try {
@@ -93,25 +57,45 @@ export const signIn = (loginData) => async (dispatch) => {
 
 export const signOut = () => async (dispatch) => {
   try {
-    // remove token from local storage
-    await api.logout();
-    return dispatch({ type: SIGNOUT_SUCCESS });
+    console.log("authActions signOut >>>>>>>");
+    // also remove token from local storage
+    dispatch({ type: SIGNOUT_SUCCESS });
+
+    // clean any error after signout
+    dispatch(clearErrors());
   } catch (error) {
     console.log(error.message);
   }
 };
 
-export const signUp = () => async (dispatch) => {
-  try {
-    return dispatch({ type: SIGNUP_SUCCESS });
-  } catch (error) {
-    console.log(error.message);
-  }
+export const signUp = (signUpData) => async (dispatch) => {
+  console.log("authActions signUp >>>>>>>");
+  await http
+    .post("/users/register", signUpData)
+    .then((res) => {
+      dispatch({
+        type: SIGNUP_SUCCESS,
+        payload: res.data,
+      });
+      // clear any error here
+      dispatch(clearErrors());
+    })
+    .catch((error) => {
+      console.log("authAction expect error >>>>>>", error.response.data);
+      dispatch(
+        setErrors(error.response.data, error.response.status, SIGNUP_FAIL)
+      );
+      dispatch({
+        type: SIGNUP_FAIL,
+      });
+    });
 };
 
+/*
 // Logout User
-export const logout = () => {
+export const logout = () => async (dispatch) => {
   return {
     type: SIGNOUT_SUCCESS,
   };
 };
+*/

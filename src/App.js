@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
+import store from "./redux/store/createStore";
 import { loadUser } from "./redux/actions/authActions";
 import Navbar from "./components/layout/navbar";
 import Home from "./components/pages/home";
@@ -9,30 +10,52 @@ import SignUp from "./components/auth/signUp";
 import "./styles/app.css";
 
 const App = () => {
-  //const {userData, setUserData} = useState({token:undefined, user:undefined});
-  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(loadUser());
+    store.dispatch(loadUser());
   }, []);
-  /*
-  componentDidMount() {
-    store.dispatch(loadUser())
-  }
-  */
   return (
     <>
-      <BrowserRouter>
-        <div className="App">
-          <Navbar />
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/signin" component={SignIn} />
-            <Route path="/signup" component={SignUp} />
-          </Switch>
-        </div>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <div className="App">
+            <Navbar />
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route path="/signin" component={SignIn} />
+              <Route path="/signup" component={SignUp} />
+            </Switch>
+          </div>
+        </BrowserRouter>
+      </Provider>
     </>
   );
 };
 
 export default App;
+
+/*
+// worked too usung class
+class App extends Component {
+  componentDidMount() {
+    store.dispatch(loadUser());
+  }
+  render() {
+    return (
+      <>
+        <Provider store={store}>
+          <BrowserRouter>
+            <div className="App">
+              <Navbar />
+              <Switch>
+                <Route exact path="/" component={Home} />
+                <Route path="/signin" component={SignIn} />
+                <Route path="/signup" component={SignUp} />
+              </Switch>
+            </div>
+          </BrowserRouter>
+        </Provider>
+      </>
+    );
+  }
+}
+*/

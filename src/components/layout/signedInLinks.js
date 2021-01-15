@@ -6,7 +6,7 @@ import { signOut } from "../../redux/actions/authActions";
 const SignedInLinks = (props) => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-  const initial = auth.name.split(" ")[0][0] + auth.name.split(" ")[1][0];
+  const initial = "hello"; //auth.name.split(" ")[0][0] + auth.name.split(" ")[1][0];
   return (
     <div>
       <ul className="right">

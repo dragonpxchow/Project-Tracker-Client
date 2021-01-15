@@ -5,11 +5,17 @@ import SignedInLinks from "./signedInLinks";
 import SignedOutLinks from "./signedOutLinks";
 
 const Navbar = () => {
+  // here we declare what we want to take from the redux store with the useSelector() hook
+  // every time one of these properties is updated on the store, our component will re-render to reflect it
   const auth = useSelector((state) => state.auth);
-
   console.log("navbar auth >>>>>", auth);
+  /*
+  const error = useSelector((state) => state.error);
+  console.log("navbar auth error >>>>>", error); 
+  */
   // show links depending on user's login status
-  const links = auth._id ? <SignedInLinks /> : <SignedOutLinks />;
+  //const links = auth.user._id ? <SignedInLinks /> : <SignedOutLinks />;
+  const links = auth.isAuthenticated ? <SignedInLinks /> : <SignedOutLinks />;
 
   return (
     <nav className="nav-wrapper blue darken-3">
