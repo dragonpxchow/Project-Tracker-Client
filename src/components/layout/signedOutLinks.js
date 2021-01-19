@@ -14,7 +14,9 @@ const SignedOutLinks = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/signin">Login</NavLink>
+          <NavLink onClick={() => dispatch(clearErrors())} to="/signin">
+            Login
+          </NavLink>
         </li>
       </ul>
     </div>

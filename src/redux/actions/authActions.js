@@ -1,5 +1,3 @@
-import * as api from "../../api/authServices";
-//import axios from "axios";
 import http from "../../api/httpServices";
 
 import { setErrors, clearErrors } from "./errorAction";
@@ -12,7 +10,6 @@ import {
   SIGNOUT_SUCCESS,
   SIGNUP_SUCCESS,
   SIGNUP_FAIL,
-  CLEAR_ERRORS,
 } from "./actionTypes";
 
 // check token and load user data
@@ -24,7 +21,7 @@ export const loadUser = () => async (dispatch, getState) => {
   // same with axios.defaults.headers.common["x-auth-token"] = jwt;
   const token = getState().auth.token;
   http.setJwt(token); // fixing bi-directional dependencies
-  console.log("authActions loadUser token >>>>", token);
+  //console.log("authActions loadUser token >>>>", token);
   await http
     .get("/users/me")
     .then((res) => {
@@ -34,7 +31,7 @@ export const loadUser = () => async (dispatch, getState) => {
       });
     })
     .catch((error) => {
-      console.log("authActions error >>>>>>>", error.response);
+      //console.log("authActions error >>>>>>>", error.response);
       dispatch(setErrors(error.response.data, error.response.status));
       dispatch({
         type: AUTH_ERROR,
@@ -42,34 +39,47 @@ export const loadUser = () => async (dispatch, getState) => {
     });
 };
 
-// action creators
-export const signIn = (loginData) => async (dispatch) => {
-  try {
-    // fetch auth data from backend
-    const { email, password } = loginData;
-    const data = await api.login(email, password);
-    return dispatch({ type: SIGNIN_SUCCESS, payload: data.user });
-  } catch (error) {
-    //return dispatch({ type: LOGIN_FAILED, payload: data });
-    console.log(error.message);
-  }
+// user signin/login
+export const signIn = (signInData) => async (dispatch) => {
+  //console.log("authActions signIn >>>>>>>");
+  await http
+    .post("/auth/login", signInData)
+    .then((res) => {
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: res.data,
+      });
+      // clear any error here
+      dispatch(clearErrors());
+    })
+    .catch((error) => {
+      //console.log("authAction expect error >>>>>>", error.response.data);
+      dispatch(
+        setErrors(error.response.data, error.response.status, SIGNIN_FAIL)
+      );
+      dispatch({
+        type: SIGNIN_FAIL,
+      });
+    });
 };
 
+// user signout/logout
 export const signOut = () => async (dispatch) => {
   try {
-    console.log("authActions signOut >>>>>>>");
+    //console.log("authActions signOut >>>>>>>");
     // also remove token from local storage
     dispatch({ type: SIGNOUT_SUCCESS });
 
     // clean any error after signout
     dispatch(clearErrors());
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
   }
 };
 
+// user signup/register
 export const signUp = (signUpData) => async (dispatch) => {
-  console.log("authActions signUp >>>>>>>");
+  //console.log("authActions signUp >>>>>>>");
   await http
     .post("/users/register", signUpData)
     .then((res) => {
@@ -81,7 +91,7 @@ export const signUp = (signUpData) => async (dispatch) => {
       dispatch(clearErrors());
     })
     .catch((error) => {
-      console.log("authAction expect error >>>>>>", error.response.data);
+      //console.log("authAction expect error >>>>>>", error.response.data);
       dispatch(
         setErrors(error.response.data, error.response.status, SIGNUP_FAIL)
       );
@@ -90,12 +100,3 @@ export const signUp = (signUpData) => async (dispatch) => {
       });
     });
 };
-
-/*
-// Logout User
-export const logout = () => async (dispatch) => {
-  return {
-    type: SIGNOUT_SUCCESS,
-  };
-};
-*/

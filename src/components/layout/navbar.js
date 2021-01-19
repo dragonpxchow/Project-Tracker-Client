@@ -13,8 +13,7 @@ const Navbar = () => {
   const error = useSelector((state) => state.error);
   console.log("navbar auth error >>>>>", error); 
   */
-  // show links depending on user's login status
-  //const links = auth.user._id ? <SignedInLinks /> : <SignedOutLinks />;
+  // show menu links depending on user's login status
   const links = auth.isAuthenticated ? <SignedInLinks /> : <SignedOutLinks />;
 
   return (

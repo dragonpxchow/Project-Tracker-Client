@@ -8,11 +8,6 @@ const SignUp = ({ signUp, isAuthenticated, error, history }) => {
   // check the list of dependency values against the values from the last render,
   // and will call your effect function if any one of them has changed
   useEffect(() => {
-    console.log(
-      "fire useEffect .................isAuthenticated .............",
-      isAuthenticated
-    );
-
     if (error.id === SIGNUP_FAIL) {
       setAuthError(error.message.error);
     } else {

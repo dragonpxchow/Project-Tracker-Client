@@ -17,6 +17,7 @@ export async function getUser() {
 */
 
 export async function login(email, password) {
+  // no longer in use !!!
   // expect token + user data
   const { data } = await http.post(apiEndPoint, { email, password });
   localStorage.setItem(tokenKey, data.token); // localStorage available to all browser

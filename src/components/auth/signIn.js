@@ -1,44 +1,59 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { connect, useDispatch } from "react-redux";
+import { SIGNIN_FAIL } from "./../../redux/actions/actionTypes";
 import { signIn } from "../../redux/actions/authActions";
 
-const SignIn = ({ history }) => {
-  // const history = useHistory();
-  const dispatch = useDispatch();
-  const [authData, setAuthData] = useState({
+const SignIn = ({ signIn, isAuthenticated, error, history }) => {
+  // check the list of dependency values against the values from the last render,
+  // and will call your effect function if any one of them has changed
+  useEffect(() => {
+    /*
+    console.log(
+      "Signup fire useEffect .................isAuthenticated .............",
+      isAuthenticated
+    );
+*/
+    if (error.id === SIGNIN_FAIL) {
+      setAuthError(error.message.error);
+    } else {
+      setAuthError(null);
+    }
+
+    if (isAuthenticated) {
+      // back to home page after registered as user successfully
+      history.push("/");
+    }
+  }, [error, isAuthenticated]);
+
+  // the useState() hook allows our component to hold its own internal state
+  const [authError, setAuthError] = useState(null);
+
+  const [signInData, setSignInData] = useState({
     email: "",
     password: "",
   });
 
-  const handleChange = (e) => {
-    setAuthData({ ...authData, [e.target.id]: e.target.value });
-    //this.setState({
-    // [e.target.id]: e.target.value,
-    //});
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(signIn(authData));
-    // back to home page
-    history.push("/");
-    //console.log("Signin >>>>>", this.state);
-    //this.props.signIn(this.state);
+  const handleOnChange = (e) => {
+    setSignInData({ ...signInData, [e.target.id]: e.target.value });
   };
 
-  //const { authError, auth } = this.props;
-  //if (auth.uid) return <Redirect to="/" />;
-  const authError = undefined;
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    // attempt to register
+    signIn(signInData);
+  };
+
   return (
     <div className="container">
-      <form className="white" onSubmit={handleSubmit}>
+      <form className="white" onSubmit={handleOnSubmit}>
         <h5 className="grey-text text-darken-3">Sign In</h5>
         <div className="input-field">
           <label htmlFor="email">Email</label>
-          <input type="email" id="email" onChange={handleChange} />
+          <input type="email" id="email" onChange={handleOnChange} />
         </div>
         <div className="input-field">
           <label htmlFor="password">Password</label>
-          <input type="password" id="password" onChange={handleChange} />
+          <input type="password" id="password" onChange={handleOnChange} />
         </div>
         <div className="input-field">
           <button className="btn pink lighten-1 z-depth-0">Login</button>
@@ -51,4 +66,17 @@ const SignIn = ({ history }) => {
   );
 };
 
-export default SignIn;
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  error: state.error,
+});
+
+// map action creator to props
+const mapDispatchToProps = (dispatch) => {
+  return {
+    // create props called "createProject" which dispatch action created called "createProject"
+    signIn: (signInData) => dispatch(signIn(signInData)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);

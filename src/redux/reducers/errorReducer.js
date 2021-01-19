@@ -9,7 +9,6 @@ const initState = {
 const errorReducer = (errorState = initState, action) => {
   switch (action.type) {
     case SET_ERRORS:
-      console.log("errorReducers >>>>>>>", action);
       return {
         message: action.payload.msg, // {name:"name of error", error:"message of error"}
         status: action.payload.status,
