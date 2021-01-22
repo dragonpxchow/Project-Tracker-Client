@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config(); // from .env
 dotenv.config({ path: ".env." + process.env.NODE_ENV }); // from custome env file eg: .env.development or .env.production etc
 
-console.log("Application environment variables:", process.env.NODE_ENV);
+console.log("Application client environment is:", process.env.NODE_ENV);
 console.log("REACT_APP_API_URL >>>>", process.env.REACT_APP_API_URL);
 
 ReactDOM.render(<App />, document.getElementById("root"));
